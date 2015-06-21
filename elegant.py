@@ -11,11 +11,13 @@ import configparser
 
 class elegantupc :
     def __init__(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
         self.url_index = "http://cas.upc.edu.cn/cas/login?service=http://i.upc.edu.cn/dcp/index.jsp"
         self.url_login = "http://cas.upc.edu.cn/cas/login"
-        self.url_userpage = "http://i.upc.edu.cn/dcp/forward.action?path=/portal/portal&p=wkHomePage"
-        self.user_username = ""
-        self.user_password = ""
+            self.url_userpage = "http://i.upc.edu.cn/dcp/forward.action?path=/portal/portal&p=wkHomePage"
+        self.user_username = config['info']['username']
+        self.user_password = config['info']['password']
         self.user_token = ""
         self.user_request = None #container of status of connection
 
@@ -35,6 +37,7 @@ class elegantupc :
             return
 
         self.user_token = token
+        return token
 
     def user_login(self):
         payload = {
@@ -58,7 +61,9 @@ class elegantupc :
         # print(response.text)
 
     def jwxt_login(self):
-        pass
+        response = self.user_request.get('http://i.upc.edu.cn/dcp/forward.action?path=dcp/apps/sso/jsp/ssoDcpSelf&appid=1180')
+        info = self.user_request.get('http://jwxt.upc.edu.cn/jwxt/xszhxxAction.do?method=addStudentPic&tktime=1434770220000')
+        print(info.text)
 
     def library_login(self):
         response = self.user_request.get('http://i.upc.edu.cn/dcp/forward.action?path=dcp/apps/sso/jsp/ssoDcpSelf&appid=1186')
@@ -68,9 +73,11 @@ class elegantupc :
         response = self.user_request.get('http://card.upc.edu.cn/Login.aspx')
         soup = bs4.BeautifulSoup(response.text)
         redirecturl = soup.find('a').get('href')
+        # print(redirecturl)
 
 if __name__ == "__main__":
     job = elegantupc()
     job.get_token()
     job.user_login()
-    job.card_login()
+    # job.card_login()
+    job.jwxt_login()
