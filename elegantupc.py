@@ -3,6 +3,7 @@ import requests
 import configparser
 import library
 import common
+import stums
 
 class ElegantUpc:
     def __init__(self):
@@ -21,7 +22,7 @@ class ElegantUpc:
     def get_token(self):
         try:
             login_soup = self.request_session.get(self.url_login)
-            login_soup = bs4.BeautifulSoup(login_soup.text, 'lxml')
+            login_soup = bs4.BeautifulSoup(login_soup.text)
 
             token = login_soup.find('input', {'name': 'lt'})['value']
             self.user_token = token
@@ -38,7 +39,7 @@ class ElegantUpc:
             print("Login failed , Check your username and password config")
             raise Exception("Login failed Error")
 
-        redirect_url = bs4.BeautifulSoup(status_page.text, 'lxml').find('a')['href']
+        redirect_url = bs4.BeautifulSoup(status_page.text).find('a')['href']
 
         self.request_session.get(redirect_url)
 
@@ -63,24 +64,10 @@ class ElegantUpc:
         }
         return payload
 
-    def access_url(self, url, method='get', payload=None):
-        if not self.login_status:
-            raise Exception("Login Status Error : You haven't logined in")
-
-        active = {
-            'get': self.request_session.get(url),
-            'post': self.request_session.post(url, data=payload)
-        }
-
-        if method not in ('get', 'post'):
-            raise Exception("Method Error : Method %s does not exist ")
-
-        return bs4.BeautifulSoup(active[method.lower()].text, 'lxml')
-
 
 if __name__ == "__main__":
     unit_tester = ElegantUpc()
     unit_tester.get_token()
     unit_tester.login()
-    library_tester = library.Library(unit_tester.request_session)
-    print(library_tester.access_session().text)
+    stums_worker = stums.StudentManageSystem(unit_tester.request_session)
+    common.access_url(stums_worker.session_worker,)
