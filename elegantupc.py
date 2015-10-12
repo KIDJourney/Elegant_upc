@@ -70,4 +70,6 @@ if __name__ == "__main__":
     unit_tester.get_token()
     unit_tester.login()
     stums_worker = stums.StudentManageSystem(unit_tester.request_session)
-    common.access_url(stums_worker.session_worker,)
+    stums_worker.access()
+    print(stums_worker.get_grade(0).text)
+
