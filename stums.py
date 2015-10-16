@@ -4,6 +4,7 @@ import common
 import authbase
 import re
 
+
 class StudentManageSystem(authbase.AuthBase):
     def __init__(self, session_worker):
         super(StudentManageSystem, self).__init__(session_worker)
@@ -16,7 +17,8 @@ class StudentManageSystem(authbase.AuthBase):
 
     def access(self):
         response = self.session_worker.get(self.auth_url)
-        self.jwxt_cookie['JSESSIONID'] = re.findall('"[A-Z0-9a-z]+"', response.text)
+        self.jwxt_cookie['JSESSIONID'] = re.findall('Cookie\("[A-Z0-9]+"', response.text)[0]
+        self.jwxt_cookie = self.jwxt_cookie[8:-1]
         print(self.jwxt_cookie)
         return response
 
