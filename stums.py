@@ -13,14 +13,17 @@ class StudentManageSystem(authbase.AuthBase):
         config = common.get_config()
         self.auth_url = config['url']['stums_auth']
         self.grade_url = config['stums']['grade']
-        self.jwxt_cookie = {}
 
     def access(self):
-        response = self.session_worker.get(self.auth_url)
-        self.jwxt_cookie['JSESSIONID'] = re.findall('Cookie\("[A-Z0-9]+"', response.text)[0]
-        self.jwxt_cookie = self.jwxt_cookie[8:-1]
-        print(self.jwxt_cookie)
-        return response
+        redirect_content = self.session_worker.get(self.auth_url ,allow_redirects = False).text
+
+        jwxt_auth = re.findall('<a href="(.+)"',redirect_content)[0]
+
+        self.session_worker = requests.Session()
+
+        response = self.session_worker.get(jwxt_auth)
+
+        return response.text
 
     def get_grade(self, page=1):
         request_payload = common.grade_check_payload_factor(page)
