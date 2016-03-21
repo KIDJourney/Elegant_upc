@@ -1,0 +1,8 @@
+[url]
+login = http://cas.upc.edu.cn/cas/login
+index = http://i.upc.edu.cn
+
+
+[user]
+username = 
+password = 
