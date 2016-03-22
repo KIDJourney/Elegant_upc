@@ -1,18 +1,9 @@
 import requests
-from bs4 import BeautifulSoup
 import hashlib
 import common
 
 
-def bs4_decorator(fuc):
-    def soup_generator(self, *args , **kwargs):
-        response = fuc(self, *args , **kwargs).text
-        return BeautifulSoup(response, 'lxml')
-
-    return soup_generator
-
-
-class iupc():
+class Iupc():
     def __init__(self):
         self.session = requests.Session()
         self.url_login, self.url_index = common.read_config_url()
@@ -22,6 +13,7 @@ class iupc():
 
     def is_available(self):
         response = self.get_content(self.url_index)
+        return response
         # return response.status_code == 200
         # return 'CAS认证转向' in response.text
 
@@ -33,9 +25,10 @@ class iupc():
     def login(self):
         data = {'username': self.username,
                 'password': self.password, 'lt': self.get_token(),
-                "loginErrCnt":"0"
+                "loginErrCnt": "0"
                 }
-        response = self.session.post(self.url_login , data=data , allow_redirects=False)
+        response = self.session.post(
+            self.url_login, data=data, allow_redirects=False)
 
         if "错误的用户名或密码" in response.text:
             raise Exception("Username or password incorrect")
@@ -48,13 +41,12 @@ class iupc():
 
         return response.status_code == 200
 
-
         # return "错误" not in response.text
 
-    @bs4_decorator
-    def get_content(self, *args , **kwargs):
-        return self.session.get(*args , **kwargs)
+    @common.bs4_decorator
+    def get_content(self, *args, **kwargs):
+        return self.session.get(*args, **kwargs)
 
 if __name__ == "__main__":
-    job = iupc()
+    job = Iupc()
     response = job.login()
